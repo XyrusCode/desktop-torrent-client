@@ -6,6 +6,9 @@ on:
     paths: ["src-tauri/tauri.conf.json"]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -29,6 +32,8 @@ jobs:
   release:
     needs: check
     if: needs.check.outputs.release == 'true'
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
