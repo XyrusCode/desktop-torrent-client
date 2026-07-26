@@ -101,40 +101,12 @@ export default function TorrentRow({ torrent }: Props) {
           )}
 
           <button
-            className="btn-ghost p-1.5"
-            title="Toggle sequential"
-            onClick={() => setSequential(torrent.id, !torrent.sequential)}
+            className="btn-ghost p-1.5 text-red-400 hover:text-red-300"
+            title="Remove"
+            onClick={() => removeTorrent(torrent.id, false)}
           >
-            <SkipForward size={14} />
+            <Trash2 size={14} />
           </button>
-
-          {showConfirm ? (
-            <div className="flex items-center gap-1">
-              <button
-                className="btn-danger p-1.5 text-xs"
-                onClick={() => {
-                  removeTorrent(torrent.id, false);
-                  setShowConfirm(false);
-                }}
-              >
-                Confirm
-              </button>
-              <button
-                className="btn-ghost p-1.5 text-xs"
-                onClick={() => setShowConfirm(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              className="btn-ghost p-1.5 text-red-400 hover:text-red-300"
-              title="Remove"
-              onClick={() => setShowConfirm(true)}
-            >
-              <Trash2 size={14} />
-            </button>
-          )}
         </div>
       </div>
     </div>

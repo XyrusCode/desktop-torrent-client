@@ -1,7 +1,7 @@
 import { useTorrentStore } from "@/stores/torrentStore";
 import TorrentRow from "@/components/TorrentRow";
 import SpeedChart from "@/components/SpeedChart";
-import { BarChart3, Activity, HardDrive, ArrowUpFromLine } from "lucide-react";
+import { BarChart3, Activity, HardDrive } from "lucide-react";
 
 export default function Dashboard() {
   const torrents = useTorrentStore((s) => s.torrents);
