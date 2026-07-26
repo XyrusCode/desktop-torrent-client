@@ -1,0 +1,24 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:event:default",
+    "core:event:allow-emit",
+    "core:event:allow-listen",
+    "dialog:default",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "notification:default",
+    "notification:allow-notify",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "opener:default",
+    "opener:allow-reveal-item-in-dir",
+    "opener:allow-open-url",
+    "shell:default",
+    "shell:allow-open",
+    "store:default"
+  ]
+}
