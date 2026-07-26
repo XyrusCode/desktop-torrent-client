@@ -1,4 +1,4 @@
-import { Search, Plus, Download } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTorrentStore } from "@/stores/torrentStore";
 
@@ -7,13 +7,6 @@ export default function TopBar() {
   const [searchQuery, setSearchQuery] = useState("");
   const search = useTorrentStore((s) => s.search);
   const setView = useTorrentStore((s) => s.setView);
-  const setModalOpen = useTorrentStore((s) => {
-    // Use a hack to trigger modal: we'll store in a module-level state
-    return () => {
-      const event = new CustomEvent("open-add-modal");
-      window.dispatchEvent(event);
-    };
-  });
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;

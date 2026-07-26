@@ -8,8 +8,6 @@ export default function Dashboard() {
 
   const totalDl = torrents.reduce((a, t) => a + t.download_rate, 0);
   const totalUl = torrents.reduce((a, t) => a + t.upload_rate, 0);
-  const totalDownloaded = torrents.reduce((a, t) => a + t.downloaded, 0);
-  const totalUploaded = torrents.reduce((a, t) => a + t.uploaded, 0);
   const activeCount = torrents.filter(
     (t) => t.state === "Downloading"
   ).length;

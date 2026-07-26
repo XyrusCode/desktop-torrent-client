@@ -1,13 +1,7 @@
-import { useState } from "react";
 import {
   Play,
   Pause,
   Trash2,
-  FileDown,
-  FileUp,
-  ArrowUpFromLine,
-  SkipForward,
-  FolderOpen,
 } from "lucide-react";
 import { useTorrentStore } from "@/stores/torrentStore";
 import type { TorrentStatus } from "@/types/torrent";
@@ -27,15 +21,10 @@ const stateColors: Record<string, string> = {
   Error: "bg-red-500",
 };
 
-export default function TorrentRow({ torrent, compact }: Props) {
-  const [showConfirm, setShowConfirm] = useState(false);
+export default function TorrentRow({ torrent }: Props) {
   const pauseTorrent = useTorrentStore((s) => s.pauseTorrent);
   const resumeTorrent = useTorrentStore((s) => s.resumeTorrent);
   const removeTorrent = useTorrentStore((s) => s.removeTorrent);
-  const setSequential = useTorrentStore((s) => s.setSequential);
-
-  const isActive =
-    torrent.state === "Downloading" || torrent.state === "Seeding";
 
   return (
     <div className="card-hover px-4 py-3">

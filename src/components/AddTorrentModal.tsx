@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, type FormEvent } from "react";
-import { X, Upload, Link, FileText } from "lucide-react";
+import { X, Link, FileText } from "lucide-react";
 import { useTorrentStore } from "@/stores/torrentStore";
 import type { AddTorrentOptions } from "@/types/torrent";
 
