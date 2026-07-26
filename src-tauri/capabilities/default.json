@@ -17,6 +17,7 @@
     "opener:default",
     "opener:allow-reveal-item-in-dir",
     "opener:allow-open-url",
+    "deep-link:default",
     "shell:default",
     "shell:allow-open",
     "store:default"

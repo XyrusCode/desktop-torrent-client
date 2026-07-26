@@ -11,7 +11,10 @@ export default function AddTorrentModal() {
   const [paused, setPaused] = useState(false);
   const [sequential, setSequential] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  const storeError = useTorrentStore((s) => s.error);
+  const clearError = useTorrentStore((s) => s.clearError);
   const addTorrent = useTorrentStore((s) => s.addTorrent);
   const addTorrents = useTorrentStore((s) => s.addTorrents);
   const categories = useTorrentStore((s) => s.categories);
@@ -36,6 +39,8 @@ export default function AddTorrentModal() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!uri.trim()) return;
+    setError(null);
+    clearError();
 
     setLoading(true);
     try {
@@ -61,8 +66,8 @@ export default function AddTorrentModal() {
 
       setUri("");
       setOpen(false);
-    } catch {
-      // Error handled by store
+    } catch (e) {
+      setError(String(e));
     } finally {
       setLoading(false);
     }
@@ -169,6 +174,12 @@ export default function AddTorrentModal() {
               <span className="text-sm text-surface-300">Sequential download</span>
             </label>
           </div>
+
+          {(error || storeError) && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-sm text-red-400">
+              {error || storeError}
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-2">
             <button

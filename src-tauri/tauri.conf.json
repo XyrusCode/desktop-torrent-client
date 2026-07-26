@@ -33,11 +33,26 @@
       "icons/128x128@2x.png",
       "icons/icon.ico"
     ],
+    "publisher": "Xyrus Code",
+    "fileAssociations": [
+      {
+        "ext": ["torrent"],
+        "name": "torrent-file",
+        "description": "BitTorrent File",
+        "mimeType": "application/x-bittorrent"
+      }
+    ],
     "windows": {
       "nsis": {
         "installMode": "perMachine"
       }
     }
   },
-  "plugins": {}
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["magnet"]
+      }
+    }
+  }
 }

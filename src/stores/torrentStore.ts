@@ -23,6 +23,7 @@ interface TorrentStore {
   error: string | null;
 
   setView: (view: ViewType) => void;
+  clearError: () => void;
   fetchTorrents: () => Promise<void>;
   fetchDetail: (id: string) => Promise<void>;
   addTorrent: (options: AddTorrentOptions) => Promise<void>;
@@ -58,6 +59,8 @@ export const useTorrentStore = create<TorrentStore>((set, get) => ({
   error: null,
 
   setView: (view) => set({ view }),
+
+  clearError: () => set({ error: null }),
 
   fetchTorrents: async () => {
     try {

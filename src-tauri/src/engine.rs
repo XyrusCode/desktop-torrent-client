@@ -138,7 +138,7 @@ impl TorrentEngine {
         let session = self.session()?;
         let id = uuid::Uuid::new_v4().to_string();
 
-        let magnet = Magnet::parse(&options.uri)
+        let _magnet = Magnet::parse(&options.uri)
             .map_err(|e| format!("Invalid magnet URI: {}", e))?;
 
         let mut params = SessionAddTorrentParams::magnet(&options.uri);
