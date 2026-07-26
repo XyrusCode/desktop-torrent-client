@@ -7,3 +7,5 @@ target/
 .env.local
 src-tauri/gen/
 src-tauri/.cargo/config.toml
+*.exe
+*.msi
