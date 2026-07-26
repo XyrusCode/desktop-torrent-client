@@ -43,6 +43,7 @@
       }
     ],
     "windows": {
+      "allowDowngrades": true,
       "nsis": {
         "installMode": "perMachine"
       }

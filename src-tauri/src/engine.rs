@@ -1,8 +1,10 @@
 use irontide::client::ClientBuilder;
-use irontide::core::{Id20, Magnet};
+use irontide::core::Id20;
 use irontide::session::{SessionAddTorrentParams, SessionHandle, TorrentStats};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use tauri::Emitter;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -91,6 +93,7 @@ pub struct TorrentEngine {
     statuses: HashMap<String, TorrentStatus>,
     download_dir: String,
     listen_port: u16,
+    started: Arc<AtomicBool>,
 }
 
 impl TorrentEngine {
@@ -100,6 +103,17 @@ impl TorrentEngine {
             statuses: HashMap::new(),
             download_dir,
             listen_port,
+            started: Arc::new(AtomicBool::new(false)),
+        }
+    }
+
+    pub fn is_started(&self) -> bool {
+        self.started.load(Ordering::SeqCst)
+    }
+
+    pub async fn wait_started(&self) {
+        while !self.started.load(Ordering::SeqCst) {
+            tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
         }
     }
 
@@ -117,6 +131,7 @@ impl TorrentEngine {
             .expect("Failed to create IronTide session");
 
         self.session = Some(session);
+        self.started.store(true, Ordering::SeqCst);
         tracing::info!("Torrent engine started on port {}", self.listen_port);
     }
 
@@ -135,21 +150,37 @@ impl TorrentEngine {
         app: &tauri::AppHandle,
         options: AddTorrentOptions,
     ) -> std::result::Result<TorrentStatus, String> {
+        self.wait_started().await;
         let session = self.session()?;
         let id = uuid::Uuid::new_v4().to_string();
 
-        let _magnet = Magnet::parse(&options.uri)
-            .map_err(|e| format!("Invalid magnet URI: {}", e))?;
+        let is_magnet = options.uri.starts_with("magnet:");
+        let is_url = options.uri.starts_with("http://") || options.uri.starts_with("https://");
 
-        let mut params = SessionAddTorrentParams::magnet(&options.uri);
+        let mut params = if is_magnet || is_url {
+            let mut p = SessionAddTorrentParams::magnet(&options.uri);
+            if let Some(seq) = options.sequential {
+                p = p.sequential_download(seq);
+            }
+            if let Some(paused) = options.paused {
+                p = p.paused(paused);
+            }
+            p
+        } else {
+            let data = std::fs::read(&options.uri)
+                .map_err(|e| format!("Failed to read torrent file '{}': {}", options.uri, e))?;
+            let mut p = SessionAddTorrentParams::bytes(data);
+            if let Some(seq) = options.sequential {
+                p = p.sequential_download(seq);
+            }
+            if let Some(paused) = options.paused {
+                p = p.paused(paused);
+            }
+            p
+        };
+
         if let Some(dir) = &options.save_path {
             params = params.with_download_dir(dir);
-        }
-        if let Some(seq) = options.sequential {
-            params = params.sequential_download(seq);
-        }
-        if let Some(paused) = options.paused {
-            params = params.paused(paused);
         }
 
         let info_hash = session.add_torrent(params).await
