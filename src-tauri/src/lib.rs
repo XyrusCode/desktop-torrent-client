@@ -62,27 +62,22 @@ pub fn run() {
             magnet_handler::setup(app_handle.clone());
 
             let handle = app.handle().clone();
-            std::thread::spawn(move || {
-                let rt = tokio::runtime::Runtime::new().unwrap();
-                rt.block_on(async {
-                    let state = handle.state::<AppState>();
-                    let mut engine = state.engine.lock().await;
-                    engine.start(&handle).await;
+            tauri::async_runtime::spawn(async move {
+                let state = handle.state::<AppState>();
+                let mut engine = state.engine.lock().await;
+                engine.start(&handle).await;
 
-                    // Stats refresh loop
-                    let handle_clone = handle.clone();
-                    tokio::spawn(async move {
-                        loop {
-                            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-                            let state = handle_clone.state::<AppState>();
-                            let mut engine = state.engine.lock().await;
-                            engine.refresh_stats().await;
-                            for t in engine.get_torrents() {
-                                let _ = handle_clone.emit("torrent://status", &t);
-                            }
-                        }
-                    });
-                });
+                // Stats refresh loop
+                let handle_clone = handle.clone();
+                loop {
+                    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                    let state = handle_clone.state::<AppState>();
+                    let mut engine = state.engine.lock().await;
+                    engine.refresh_stats().await;
+                    for t in engine.get_torrents() {
+                        let _ = handle_clone.emit("torrent://status", &t);
+                    }
+                }
             });
 
             Ok(())
