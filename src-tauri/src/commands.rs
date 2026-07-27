@@ -23,20 +23,15 @@ pub async fn add_torrents(
     state: State<'_, AppState>,
     items: Vec<AddTorrentOptions>,
 ) -> Result<Vec<TorrentStatus>, String> {
-    let mut engine = state.engine.lock().await;
     let mut results = Vec::new();
-    let db = state.db.lock().await;
 
     for options in items {
-        match engine.add_torrent(&app, options).await {
-            Ok(status) => {
-                let _ = db.save_torrent(&status);
-                results.push(status);
-            }
-            Err(e) => {
-                let _ = app.emit("torrent://error", &e);
-            }
-        }
+        let status = {
+            let mut engine = state.engine.lock().await;
+            engine.add_torrent(&app, options).await?
+        };
+        state.db.lock().await.save_torrent(&status)?;
+        results.push(status);
     }
     Ok(results)
 }
