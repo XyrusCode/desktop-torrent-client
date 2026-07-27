@@ -85,3 +85,22 @@ jobs:
           releaseBody: "See the assets below to download and install this release."
           releaseDraft: false
           prerelease: false
+
+      # Fallback: if the tauri action doesn't attach artifacts, upload any bundles found
+      - name: Upload built bundles (fallback)
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="v${VERSION}"
+          echo "Looking for bundles to upload for ${TAG}"
+          if [ -d "src-tauri/target/release/bundle" ]; then
+            find src-tauri/target/release/bundle -type f -maxdepth 3 -print0 | while IFS= read -r -d '' file; do
+              echo "Uploading: $file"
+              gh release upload "$TAG" "$file" --repo ${{ github.repository }} --clobber || true
+            done
+          else
+            echo "No bundle directory found"
+          fi
